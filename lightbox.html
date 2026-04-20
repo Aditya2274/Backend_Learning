@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lightbox Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        #lightbox {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(0, 0, 0, 0.8);
+            text-align: center;
+            padding-top: 50px;
+            color: white;
+            z-index: 1000;
+        }
+        #lightbox img {
+            max-width: 80%;
+            max-height: 70vh;
+            background: #fff;
+        }
+        fieldset.toolbar {
+            border: none;
+            margin-top: 15px;
+        }
+        fieldset.toolbar[disabled] {
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Lightbox Demo</h2>
+    <p>Click the button below to open the lightbox.</p>
+    <button onclick="lightBox()">Open Lightbox</button>
+
+    <!-- The actual Lightbox HTML Elements -->
+    <div id="lightbox">
+        <img alt="Lightbox Image" />
+        
+        <!-- Fieldset is used so we can disable the entire toolbar group at once -->
+        <fieldset class="toolbar" disabled>
+            <button onclick="fixRedEyeCommand()">Fix Red Eye</button>
+            <button onclick="closeLightbox()">Close</button>
+        </fieldset>
+    </div>
+
+    <script>
+        // DOM Elements mapping to your snippet
+        const lightboxElem = document.querySelector("#lightbox");
+        const lightboxImgElem = lightboxElem.querySelector("img");
+        const lightboxControlsElem = lightboxElem.querySelector(".toolbar");
+
+        // loadImage helper
+        async function loadImage(url, elem) {
+            return new Promise((resolve, reject) => {
+                elem.onload = () => resolve(elem);
+                elem.onerror = reject;
+                elem.src = url;
+            });
+        }
+
+        // Modified your lightBox code slightly to use a demo image URL that stays online
+        async function lightBox(url) {
+            lightboxElem.style.display = "block";
+            // Wait for image to load before enabling controls
+            await loadImage("https://picsum.photos/800/600", lightboxImgElem);
+            lightboxControlsElem.disabled = false;
+        }
+
+        // Mock implementation of the missing fixRedEye function
+        function fixRedEye(imgElement) {
+            alert("Red eye fixed for the image!");
+            // In reality, canvas or filter operations would go here
+            imgElement.style.filter = "grayscale(100%) sepia(100%) hue-rotate(300deg)"; 
+        }   
+
+        // Your fixRedEyeCommand checking code
+        function fixRedEyeCommand() {
+            if (lightboxElem.style.display === "block" && lightboxImgElem.complete) {
+                fixRedEye(lightboxImgElem);
+            } else {
+                console.warn("Can't start doing this until the image is fully loaded");
+            }
+        }
+
+        // Helper to close the lightbox 
+        function closeLightbox() {
+            lightboxElem.style.display = "none";
+            lightboxImgElem.src = "";
+            lightboxControlsElem.disabled = true; // resets the toolbar
+            lightboxImgElem.style.filter = "none";
+        }
+    </script>
+</body>
+</html>
