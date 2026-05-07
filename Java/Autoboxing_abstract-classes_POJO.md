@@ -92,3 +92,73 @@ __Null Pointer Exception in AutoBoxing__:
 Integer x= null; (can store since it's an object only)
 int y=x;
 System.out.println(y); //Throws Null Pointer exception .b/c primitives can't handle it 
+
+== vs equals():
+  == -> compares references
+  .equals() -> compares values
+
+_Caching Inside Integer Class_:
+![alt text](image.png)
+In Java, the Integer class employs a clever memory-optimization technique known as Integer Caching. Instead of creating a brand-new object every time you need a small number, Java reuses pre-existing objects from a "pool."
+
+How It Works
+When you use autoboxing (e.g., Integer x = 10;) or call Integer.valueOf(int), Java doesn't immediately allocate memory on the heap. Instead, it checks an internal static inner class called IntegerCache.
+
+Default Range: By default, Java caches all integers between -128 and 127.
+
+The Logic: If the value you're requesting falls within this range, Java returns a reference to a shared object from the cache. If it’s outside this range, it creates a new Integer object.
+
+Why Do This?
+Small integers (especially 0, 1, -1, etc.) are used incredibly frequently in loops, array indexing, and logic. Reusing these objects:
+
+Reduces Memory Footprint: You aren't littering the heap with thousands of "1" objects.
+
+Improves Performance: Avoiding object creation reduces the pressure on the Garbage Collector.
+
+The "Gotcha": == vs .equals()
+This caching behavior is often why junior developers run into confusing bugs. Because the cache returns the same reference for small numbers, the identity operator (==) appears to work, but it fails as soon as the numbers get larger.
+
+Java
+Integer a = 100;
+Integer b = 100;
+System.out.println(a == b); // true (Both point to the same cached object)
+
+Integer c = 200;
+Integer d = 200;
+System.out.println(c == d); // false (Outside cache range; two distinct objects)
+Pro Tip: Always use .equals() to compare the values of wrapper classes. Using == is essentially gambling on whether the value is cached or not.
+
+Can You Change the Range?
+Yes, but only the upper bound. You can't change the -128 floor, but you can increase the ceiling using a JVM argument if your application heavily uses larger numbers:
+
+-XX:AutoBoxCacheMax=<size>
+
+Abstract Classes:
+1. Are constructors allowed?
+Yes. Even though you cannot instantiate an abstract class (you can't do new MyAbstractClass()), it can still have a constructor. This constructor is called when a concrete subclass is instantiated using super(). It is typically used to initialize fields defined in the abstract class.
+
+2. Can abstract classes be final?
+No. This is a fundamental contradiction in Java.
+
+abstract means the class must be extended to be useful.
+
+final means the class cannot be extended.
+If you try to use both, the compiler will throw an error.
+
+3. Can abstract classes have static methods?
+Yes. Static methods belong to the class itself, not to an instance. You can call a static method of an abstract class using the class name (e.g., AbstractClass.myStaticMethod()) without ever needing to create an object.
+
+4. Can abstract classes have private methods?
+Yes. Abstract classes can have private methods to provide helper logic for other methods within the same class. However, keep in mind that a private method cannot be abstract, because a private method cannot be seen (and thus cannot be overridden) by subclasses.
+
+5. Can abstract classes have final methods?
+Yes. You can define a method with a full implementation in an abstract class and mark it final. This ensures that while subclasses inherit the method, they are prohibited from overriding or changing its behavior.
+
+6. Can abstract classes have no abstract methods?
+Yes. You can declare a class as abstract even if it contains only concrete methods (or no methods at all). This is a common design pattern used when you want to prevent developers from creating instances of a class, forcing them to use a subclass instead.
+
+_POJO classes_:
+
+
+
+![alt text](image-1.png)
